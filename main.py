@@ -50,12 +50,12 @@ def update_user():
     _username = _json['username']
     _email = _json['email']
     _password = _json['password']
-    _singupDate = _json['singupDate']
+    _signUpDate = _json['signUpDate']
 
     
-    if _firstName and _lastName and _username and _email and _password and _singupDate and _id and request.method == 'PUT':
+    if _firstName and _lastName and _username and _email and _password and _signUpDate and _id and request.method == 'PUT':
         
-        db.testQ.update_one({'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, {'$set': {'firstName': _firstName, 'lastName': _lastName, 'username': _username, 'email': _email, 'password': _password}})
+        db.testQ.update_one({'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, {'$set': {'firstName': _firstName, 'lastName': _lastName, 'username': _username, 'email': _email, 'password': _password, 'signUpDate': _signUpDate}})
         resp = jsonify('User updated successfully!')
         resp.status_code = 200
         return resp
@@ -71,11 +71,11 @@ def add_data():
    username = request.json["username"]
    email = request.json["email"]
    password = request.json["password"]
-   singupDate = request.json["singupDate"]
+   signUpDate = request.json["signUpDate"]
 
    if username and email and password:
        
-       id = db.testQ.insert_one({'firstName':firstName, 'lastName':lastName, 'username':username, 'email':email, 'password':password, 'singupDate':singupDate})
+       id = db.testQ.insert_one({'firstName':firstName, 'lastName':lastName, 'username':username, 'email':email, 'password':password, 'signUpDate':signUpDate})
        response = jsonify({
            "_id": str(id),
            "firstName":firstName,
@@ -83,7 +83,7 @@ def add_data():
            "username":username,
            "email":email,
            "password":password,
-           "singupDate":singupDate
+           "singupDate":signUpDate
        })
 
        response.status_code = 201
