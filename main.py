@@ -1,9 +1,8 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from bson.json_util import dumps
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, jsonify
 from dotenv import load_dotenv
-
 import flask
 import os
 
@@ -25,16 +24,19 @@ app.config["MONGO_URI"] = connection_string
 mongoDB_client = PyMongo(app)
 db = mongoDB_client.db
 
+@app.route("/")
+def root():
+    return 'Hi'
+
 @app.route("/user")
 def home():
     testQs = db.testQ.find()
-    resp = dumps(testQs)
-    return resp
+    return Response(jsonify(dumps(testQs)), content_type='application/json')
 
 @app.route('/user/<id>')
 def user(id):
     user = db.testQ.find_one({'_id': ObjectId(id)})
-    return jsonify(user)
+    return Response(jsonify(dumps(user)), content_type='application/json')
 
 @app.route('/update', methods=['PUT'])
 def update_user():
