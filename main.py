@@ -25,10 +25,6 @@ app.config["MONGO_URI"] = connection_string
 mongoDB_client = PyMongo(app)
 db = mongoDB_client.db
 
-@app.route("/")
-def root():
-    return 'Hi'
-
 @app.route("/user")
 def home():
     testQs = db.testQ.find()
