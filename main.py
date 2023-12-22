@@ -1,7 +1,7 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from bson.json_util import dumps
-from flask import Flask, jsonify, request, Response, jsonify
+from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 import flask
 import os
@@ -31,12 +31,12 @@ def root():
 @app.route("/user")
 def home():
     testQs = db.testQ.find()
-    return Response(jsonify(dumps(testQs)), content_type='application/json')
+    return jsonify(dumps(testQs))
 
 @app.route('/user/<id>')
 def user(id):
     user = db.testQ.find_one({'_id': ObjectId(id)})
-    return Response(jsonify(dumps(user)), content_type='application/json')
+    return jsonify(dumps(user))
 
 @app.route('/update', methods=['PUT'])
 def update_user():
