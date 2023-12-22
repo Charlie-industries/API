@@ -38,8 +38,7 @@ def home():
 @app.route('/user/<id>')
 def user(id):
     user = db.testQ.find_one({'_id': ObjectId(id)})
-    resp = Response(jsonify(dumps(user)), content_type='application/json')
-    return resp
+    return jsonify(dumps(user)), 200, {'Content-Type': 'application/json'}
 
 @app.route('/update', methods=['PUT'])
 def update_user():
