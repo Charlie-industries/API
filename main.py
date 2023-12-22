@@ -31,12 +31,12 @@ def root():
 @app.route("/user")
 def home():
     testQs = db.testQ.find()
-    return jsonify(dumps(testQs))
+    return jsonify(testQs)
 
 @app.route('/user/<id>')
 def user(id):
     user = db.testQ.find_one({'_id': ObjectId(id)})
-    return jsonify(dumps(user))
+    return jsonify(user)
 
 @app.route('/update', methods=['PUT'])
 def update_user():
