@@ -81,7 +81,7 @@ def add_data():
            "username":username,
            "email":email,
            "password":password,
-           "signupDate":signUpDate
+           "signUpDate":signUpDate
        })
 
        response.status_code = 201
