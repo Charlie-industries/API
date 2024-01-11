@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 from bson.json_util import dumps
 from flask import Flask, jsonify, request
 from dotenv import load_dotenv
-import flask
+from flask import Flask, Response
 import os
 
 load_dotenv()
@@ -12,7 +12,6 @@ app = Flask(__name__)
 app.debug = True
 
 connection_string: str = os.environ.get("CONNECTION_STRING")
-print(f"Connection String: {connection_string}")
 connection_string = connection_string
 
 if not connection_string:
@@ -31,18 +30,19 @@ def root():
 @app.route("/user")
 def home():
     testQs = db.testQ.find()
-    return jsonify(dumps(testQs))
+    response = dumps(testQs)
+    return Response(response, mimetype="application/json")
 
 @app.route('/user/<id>')
 def user(id):
     user = db.testQ.find_one({'_id': ObjectId(id)})
-    return jsonify(dumps(user))
+    response = dumps(user)
+    return Response(response, mimetype="application/json")
 
-@app.route('/update', methods=['PUT'])
-def update_user():
+@app.route('/update/<id>', methods=['PUT'])
+def update_user(id):
     _json = request.json
-    print (_json)
-    _id = _json['_id']
+
     _firstName = _json['firstName']
     _lastName = _json['lastName']
     _username = _json['username']
@@ -51,9 +51,16 @@ def update_user():
     _signUpDate = _json['signUpDate']
 
     
-    if _firstName and _lastName and _username and _email and _password and _signUpDate and _id and request.method == 'PUT':
+    if _firstName and _lastName and _username and _email and _password and _signUpDate and request.method == 'PUT':
         
-        db.testQ.update_one({'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, {'$set': {'firstName': _firstName, 'lastName': _lastName, 'username': _username, 'email': _email, 'password': _password, 'signUpDate': _signUpDate}})
+        db.testQ.update_one({'_id': ObjectId(id)},
+                            {'$set': {'firstName': _firstName,
+                                      'lastName': _lastName,
+                                      'username': _username,
+                                      'email': _email,
+                                      'password': _password,
+                                      'signUpDate': _signUpDate}})
+        
         resp = jsonify('User updated successfully!')
         resp.status_code = 200
         return resp
@@ -73,7 +80,12 @@ def add_data():
 
    if username and email and password:
        
-       id = db.testQ.insert_one({'firstName':firstName, 'lastName':lastName, 'username':username, 'email':email, 'password':password, 'signUpDate':signUpDate})
+       id = db.testQ.insert_one({'firstName':firstName,
+                                 'lastName':lastName,
+                                 'username':username,
+                                 'email':email,
+                                 'password':password,
+                                 'signUpDate':signUpDate})
        response = jsonify({
            "_id": str(id),
            "firstName":firstName,
