@@ -14,7 +14,7 @@ app.debug = True
 sString: str = os.environ.get("SSTRING")
 uDatabase: str = os.environ.get("UDATABASE")
 iDatabase: str = os.environ.get("IDATABASE")
-eString: str = os.get("ESTRING")
+eString: str = os.environ.get("ESTRING")
 
 
 def connection(appi, database):
