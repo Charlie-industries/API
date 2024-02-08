@@ -11,38 +11,42 @@ load_dotenv()
 app = Flask(__name__)
 app.debug = True
 
-connection_string: str = os.environ.get("CONNECTION_STRING")
-connection_string = connection_string
-
-if not connection_string:
-    raise ValueError("MongoDB connection string not found in environment variables")
-
-app.config["MONGO_URI"] = connection_string
+sString: str = os.environ.get("SSTRING")
+uDatabase: str = os.environ.get("UDATABASE")
+iDatabase: str = os.environ.get("IDATABASE")
+eString: str = os.get("ESTRING")
 
 
-mongoDB_client = PyMongo(app)
-db = mongoDB_client.db
-
-@app.route("/")
-def root():
-    return 'Hi'
+def connection(appi, database):
+    connection:str = sString + database + eString
+    print(connection)
+    appi.config["MONGO_URI"] = connection
+    mongoDB_client = PyMongo(appi)
+    db = mongoDB_client.db
+    print(db)
+    return db
 
 @app.route("/user")
 def home():
+    db = connection(app,uDatabase)
+
     testQs = db.testQ.find()
     response = dumps(testQs)
     return Response(response, mimetype="application/json")
 
 @app.route('/user/<id>')
 def user(id):
+    db = connection(app,uDatabase)
+
     user = db.testQ.find_one({'_id': ObjectId(id)})
     response = dumps(user)
     return Response(response, mimetype="application/json")
 
 @app.route('/update/<id>', methods=['PUT'])
 def update_user(id):
-    _json = request.json
+    db = connection(app,uDatabase)
 
+    _json = request.json
     _firstName = _json['firstName']
     _lastName = _json['lastName']
     _username = _json['username']
@@ -69,8 +73,9 @@ def update_user(id):
 
 @app.post('/add')
 def add_data():
+   db = connection(app,uDatabase)
+
    _json = request.json
-   print("JSON ", _json)
    firstName = request.json["firstName"]
    lastName = request.json["lastName"]
    username = request.json["username"]
@@ -103,10 +108,83 @@ def add_data():
 
 @app.route('/delete/<id>', methods=['DELETE'])
 def delete_user(id):
-	db.testQ.delete_one({'_id': ObjectId(id)})
-	resp = jsonify('User deleted successfully!')
-	resp.status_code = 200
-	return resp
+    db = connection(app,uDatabase)
+
+    db.testQ.delete_one({'_id': ObjectId(id)})
+    resp = jsonify('User deleted successfully!')
+    resp.status_code = 200
+    return resp
+
+@app.route('/receipts')
+def receiptsHome():
+    db = connection(app,iDatabase)
+
+    invoiceQs = db.invoiceQ.find()
+    response = dumps(invoiceQs)
+    return Response(response, mimetype="application/json")
+
+@app.route('/receipt/<id>')
+def receipt(id):
+    db = connection(app,iDatabase)
+
+    invoiceQs = db.invoiceQ.find_one({'_id': ObjectId(id)})
+    response = dumps(invoiceQs)
+    return Response(response, mimetype="application/json")
+
+@app.post('/addI')
+def add_receipt():
+    db = connection(app,iDatabase)
+
+    _json = request.json
+    cashierName = request.json["cashierName"]
+    company = request.json["company"]
+    address = request.json["address"]
+    date = request.json["date"]
+    item = request.json["item"]
+    subTotal = _json["subTotal"]
+    tax = _json["tax"]
+    total = _json["total"]
+    state = _json["state"]
+    invoice_data = {
+        "cashierName": cashierName,
+        "company": company,
+        "address": address,
+        "date": date,
+        "item": item,
+        "subTotal": subTotal,
+        "tax": tax,
+        "total": total,
+        "state": state
+    }
+    
+    if invoice_data:
+        id = db.invoiceQ.insert_one(invoice_data)
+        response = jsonify({
+            "_id": str(id.inserted_id),
+            "cashierName": cashierName,
+            "company": company,
+            "address": address,
+            "date": date,
+            "item": item,
+            "subTotal": subTotal,
+            "tax": tax,
+            "total": total,
+            "state": state
+        })
+
+        response.status_code = 201
+        return response
+    else:
+       return not_found()
+   
+@app.route('/deleteReceipt/<id>', methods=['DELETE'])
+def delete_receipt(id):
+    db = connection(app,iDatabase)
+    db.invoiceQ.delete_one({'_id': ObjectId(id)})
+    
+    resp = jsonify('Receipt deleted successfully!')
+    resp.status_code = 200
+    return resp
 
 @app.errorhandler(404)
 def not_found(error=None):
