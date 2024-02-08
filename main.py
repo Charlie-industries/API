@@ -19,11 +19,11 @@ eString: str = os.get("ESTRING")
 
 def connection(appi, database):
     connection:str = sString + database + eString
-    print(connection)
+
     appi.config["MONGO_URI"] = connection
     mongoDB_client = PyMongo(appi)
     db = mongoDB_client.db
-    print(db)
+    
     return db
 
 @app.route("/user")
