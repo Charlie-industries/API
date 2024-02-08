@@ -26,12 +26,22 @@ def connection(appi, database):
 
     return db
 
+@app.route('/login/<data>')
+def login(data):
+    db = connection(app,uDatabase)
+
+    user = db.testQ.find_one({"$or": [{"username": data}, {"email": data}]})
+    response = dumps(user)
+
+    return Response(response, mimetype="application/json")
+
 @app.route("/user")
 def home():
     db = connection(app,uDatabase)
 
     testQs = db.testQ.find()
     response = dumps(testQs)
+
     return Response(response, mimetype="application/json")
 
 @app.route('/user/<id>')
@@ -40,6 +50,7 @@ def user(id):
 
     user = db.testQ.find_one({'_id': ObjectId(id)})
     response = dumps(user)
+
     return Response(response, mimetype="application/json")
 
 @app.route('/update/<id>', methods=['PUT'])
@@ -67,6 +78,7 @@ def update_user(id):
         
         resp = jsonify('User updated successfully!')
         resp.status_code = 200
+        
         return resp
     else:
         return not_found()
