@@ -18,12 +18,12 @@ eString: str = os.get("ESTRING")
 
 
 def connection(appi, database):
-    connection:str = sString + database + eString
+    connection = sString + database + eString
 
     appi.config["MONGO_URI"] = connection
     mongoDB_client = PyMongo(appi)
     db = mongoDB_client.db
-    
+
     return db
 
 @app.route("/user")
